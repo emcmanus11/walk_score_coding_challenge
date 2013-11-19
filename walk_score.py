@@ -17,45 +17,34 @@ def main():
   intree = dict((key,(dic[key][0],dic[key][1])) for key in dic if not(len(dic[key][1])==len(dic[key][0]) and len(dic[key][0])==1) and len(dic[key][1])>0)
   notintree = dict((key,(dic[key][0],dic[key][1])) for key in dic if len(dic[key][1])==len(dic[key][0]) and len(dic[key][0])==1)
   newtree=intree
-  print "intree "+str(intree)
-  print "notintree "+str(notintree)
-  while(notintree!={} and intree!={}):
+
+  while(notintree!={}):
     newtree={}
-    for x in intree:
-      lis= Set([])
-      inputlis = Set([])
-      for y in intree[x][1]:
-        if(y in notintree):
-          lis.update(notintree[y][1])
-          if(y in lis):
-            lis.remove(y)
-        else:
-          lis.add(y)
-      for y in intree[x][0]:
-        if(y in notintree):
-          inputlis.update(notintree[y][0])
-          if(y in inputlis):
-            inputlis.remove(y)
-        else:
-          inputlis.add(y)
-      newtree[x]=(list(inputlis),list(lis))
-      intree[x]=(list(inputlis),list(lis))
-    dic = newtree
+    for x in notintree:
+      isinput = dict((a,intree[a]) for a in intree if x in intree[a][0])
+      isoutput = dict((a,intree[a]) for a in intree if x in intree[a][1])
+      for y in isinput:
+        if y in intree:
+          lis = intree[y][0]
+          lis.remove(x)
+          lis = Set(lis)
+          lis.update(notintree[x][0])
+          intree[y]=(list(lis),intree[y][1])
+      for y in isoutput:
+        if y in intree:
+          lis = intree[y][1]
+          lis.remove(x)
+          lis = Set(lis)
+          lis.update(notintree[x][1])
+          intree[y]=(intree[y][0],list(lis))
+
+    dic = intree
     intree = dict((key,(dic[key][0],dic[key][1])) for key in dic if not(len(dic[key][1])==len(dic[key][0]) and len(dic[key][0])==1) and len(dic[key][1])>0)
-    notintree = dict((key,(dic[key][0],dic[key][1])) for key in dic if len(dic[key][1])==len(dic[key][0]) and len(dic[key][0])==1) 
-    print "intree "+str(intree)
-    print "notintree "+str(notintree)
-  print newtree
-  # print str(dic)
-  # print str(intree)
-  # print str(notintree)
-      
-  # for x in newtree:
-  #   for y in newtree[x]:
-  #     print x+"\t"+y
-  # print "newtree "+ str(newtree)
-  # print "notintree "+str(notintree)
-  # print "intree "+str(intree)
+    notintree = dict((key,(dic[key][0],dic[key][1])) for key in dic if len(dic[key][1])==len(dic[key][0]) and len(dic[key][0])==1)
+
+  for x in intree:
+    for y in intree[x][1]:
+      print x+"\t"+y
 
 
 main()
