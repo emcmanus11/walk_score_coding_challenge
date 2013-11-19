@@ -1,16 +1,12 @@
 import fileinput
 from sets import Set
 
-
-
 def main():
-  #dictionary of node --> (input nodes, output nodes)
   dic = dict()
   for line in fileinput.input():
-    if line.strip() == "DONE":
-      print "HI THERE"
-      break
     edge = line.split()
+    if(len(edge)!=2):
+      break 
     if(edge[0] in dic):
       dic[edge[0]]=(dic[edge[0]][0],dic[edge[0]][1]+[edge[1]])
     else:
@@ -19,49 +15,36 @@ def main():
       dic[edge[1]]=(dic[edge[1]][0]+[edge[0]],dic[edge[1]][1])
     else:
       dic[edge[1]]=([edge[0]],[])
-  intree = dict((key,(dic[key][0],dic[key][1])) for key in dic if not(len(dic[key][1])==len(dic[key][0]) and len(dic[key][0])==1) and len(dic[key][1])>0)
-  notintree = dict((key,(dic[key][0],dic[key][1])) for key in dic if len(dic[key][1])==len(dic[key][0]) and len(dic[key][0])==1)
-  newtree=intree
+  inTree = dict((key,(dic[key][0],dic[key][1])) for key in dic if not(len(dic[key][1])==len(dic[key][0]) and len(dic[key][0])==1) and len(dic[key][1])>0)
+  
+  notInTree = dict((key,(dic[key][0],dic[key][1])) for key in dic if len(dic[key][1])==len(dic[key][0]) and len(dic[key][0])==1)
 
-  while(notintree!={}):
-    newtree={}
-    for x in notintree:
-      inisinput = dict((a,intree[a]) for a in intree if x in intree[a][0])
-      inisoutput = dict((a,intree[a]) for a in intree if x in intree[a][1])
-      outisinput = dict((a,notintree[a]) for a in notintree if x in notintree[a][0])
-      outisoutput = dict((a,notintree[a]) for a in notintree if x in notintree[a][1])
-      treesout = [outisoutput, inisoutput]
-      treesin = [outisinput, inisinput]
-      for isinput in treesin:
+  while(notInTree!={} and inTree!={}):
+    for x in notInTree:
+      inTreeInput = dict((a,inTree[a]) for a in inTree if x in inTree[a][0])
+      inTreeOutput = dict((a,inTree[a]) for a in inTree if x in inTree[a][1])
+      notInTreeInput = dict((a,notInTree[a]) for a in notInTree if x in notInTree[a][0])
+      notInTreeOutput = dict((a,notInTree[a]) for a in notInTree if x in notInTree[a][1])
+      childNodes = [notInTreeOutput, inTreeOutput]
+      parentNodes = [notInTreeInput, inTreeInput]
+      for isinput in parentNodes:
         for y in isinput:
-          tree=notintree
-          if y in intree:
-            tree = intree
-          lis = tree[y][0]
-          lis.remove(x)
-          lis = Set(lis)
-          lis.update(notintree[x][0])
-          tree[y]=(lis,tree[y][1])
-      for isinput in treesout:
+          tree=notInTree
+          if y in inTree:
+            tree = inTree
+          tree[y]=(list(Set([z for z in tree[y][0] if z != x]+notInTree[x][0])),tree[y][1])
+      for isinput in childNodes:
         for y in isinput:
-          tree=notintree
-          if y in intree:
-            tree = intree
-          lis = tree[y][1]
-          lis.remove(x)
-          lis = Set(lis)
-          lis.update(notintree[x][1])
-          tree[y]=(tree[y][0],lis)
+          tree=notInTree
+          if y in inTree:
+            tree = inTree
+          tree[y]=(tree[y][0],list(Set([z for z in tree[y][1] if z != x]+notInTree[x][1])))
+    dic = inTree
+    inTree = dict((key,(dic[key][0],dic[key][1])) for key in dic if not(len(dic[key][1])==len(dic[key][0]) and len(dic[key][0])==1) and len(dic[key][1])>0)
+    notInTree = dict((key,(dic[key][0],dic[key][1])) for key in dic if len(dic[key][1])==len(dic[key][0]) and len(dic[key][0])==1)
 
-    dic = intree
-    intree = dict((key,(dic[key][0],dic[key][1])) for key in dic if not(len(dic[key][1])==len(dic[key][0]) and len(dic[key][0])==1) and len(dic[key][1])>0)
-    notintree = dict((key,(dic[key][0],dic[key][1])) for key in dic if len(dic[key][1])==len(dic[key][0]) and len(dic[key][0])==1)
-
-  tree = "Output Tree: "
-  for x in intree:
-    for y in intree[x][1]:
-      tree+=x+"\t"+y+"\n"
-  print tree
-
-
+  for x in inTree:
+    for y in inTree[x][1]:
+      print x+"\t"+y
+  
 main()
