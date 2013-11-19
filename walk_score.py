@@ -24,41 +24,44 @@ def main():
   newtree=intree
 
   while(notintree!={}):
-    print "dic: "+str(dic)
-    print "intree: "+str(intree)
-    print "notintree: "+str(notintree)
-    print("____________________")
     newtree={}
     for x in notintree:
-      isinput = dict((a,intree[a]) for a in intree if x in intree[a][0])
-      isoutput = dict((a,intree[a]) for a in intree if x in intree[a][1])
-      for y in isinput:
-        if y in intree:
-          lis = intree[y][0]
+      inisinput = dict((a,intree[a]) for a in intree if x in intree[a][0])
+      inisoutput = dict((a,intree[a]) for a in intree if x in intree[a][1])
+      outisinput = dict((a,notintree[a]) for a in notintree if x in notintree[a][0])
+      outisoutput = dict((a,notintree[a]) for a in notintree if x in notintree[a][1])
+      treesout = [outisoutput, inisoutput]
+      treesin = [outisinput, inisinput]
+      for isinput in treesin:
+        for y in isinput:
+          tree=notintree
+          if y in intree:
+            tree = intree
+          lis = tree[y][0]
           lis.remove(x)
           lis = Set(lis)
           lis.update(notintree[x][0])
-          intree[y]=(lis,intree[y][1])
-      for y in isoutput:
-        if y in intree:
-          lis = intree[y][1]
+          tree[y]=(lis,tree[y][1])
+      for isinput in treesout:
+        for y in isinput:
+          tree=notintree
+          if y in intree:
+            tree = intree
+          lis = tree[y][1]
           lis.remove(x)
           lis = Set(lis)
           lis.update(notintree[x][1])
-          intree[y]=(intree[y][0],lis)
+          tree[y]=(tree[y][0],lis)
 
     dic = intree
     intree = dict((key,(dic[key][0],dic[key][1])) for key in dic if not(len(dic[key][1])==len(dic[key][0]) and len(dic[key][0])==1) and len(dic[key][1])>0)
     notintree = dict((key,(dic[key][0],dic[key][1])) for key in dic if len(dic[key][1])==len(dic[key][0]) and len(dic[key][0])==1)
-    print "dic: "+str(dic)
-    print "intree: "+str(intree)
-    print "notintree: "+str(notintree)
-    print("_*_*_*_*_*_*_*_*_*_*_*_*_*")
-    
 
+  tree = "Output Tree: "
   for x in intree:
     for y in intree[x][1]:
-      print x+"\t"+y
+      tree+=x+"\t"+y+"\n"
+  print tree
 
 
 main()
